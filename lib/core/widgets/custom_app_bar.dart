@@ -7,7 +7,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBack;
   final PreferredSizeWidget? bottom;
 
-  const CustomAppBar({super.key, required this.title, this.showBack = true, this.bottom});
+  const CustomAppBar({
+    super.key,
+    required this.title,
+    this.showBack = true,
+    this.bottom,
+  });
 
   @override
   Widget build(BuildContext context) {

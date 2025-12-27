@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'core/routes/app_router.dart';
 import 'core/routes/routes.dart';
 import 'core/theme/app_theme.dart';
 import 'core/di/injection_container.dart' as di;
@@ -55,7 +54,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: AppTheme.darkTheme,
           initialRoute: Routes.login,
-          onGenerateRoute: AppRouter.generateRoute,
+          // onGenerateRoute: AppRouter.generateRoute,
           localizationsDelegates: context.localizationDelegates,
           locale: const Locale('ar'),
           supportedLocales: const [Locale('ar')],

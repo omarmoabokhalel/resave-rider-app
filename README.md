@@ -1,16 +1,60 @@
-# resave_rider
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+lib/
+│
+├── core/
+│   ├── network/
+│   │   ├── api_service.dart
+│   │   ├── api_constants.dart
+│   │   └── dio_interceptor.dart
+│   │
+│   ├── error/
+│   │   └── failure.dart
+│   │
+│   ├── utils/
+│   │   └── helpers.dart
+│
+├── features/
+│   ├── auth/
+│   │   ├── data/
+│   │   │   ├── models/
+│   │   │   │   └── rider_model.dart
+│   │   │   ├── datasources/
+│   │   │   │   └── auth_remote_ds.dart
+│   │   │   └── repositories/
+│   │   │       └── auth_repo_impl.dart
+│   │   │
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   └── rider.dart
+│   │   │   ├── repositories/
+│   │   │   │   └── auth_repo.dart
+│   │   │   └── usecases/
+│   │   │       └── login_rider.dart
+│   │   │
+│   │   └── presentation/
+│   │       ├── bloc/
+│   │       └── pages/
+│   │           └── login_page.dart
+│
+│   ├── orders/
+│   │   ├── data/
+│   │   │   ├── models/
+│   │   │   │   ├── order_model.dart
+│   │   │   │   └── order_item_model.dart
+│   │   │   ├── datasources/
+│   │   │   │   └── orders_remote_ds.dart
+│   │   │   └── repositories/
+│   │   │       └── orders_repo_impl.dart
+│   │   │
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   ├── repositories/
+│   │   │   └── usecases/
+│   │   │
+│   │   └── presentation/
+│   │       ├── bloc/
+│   │       └── pages/
+│   │           ├── orders_page.dart
+│   │           └── update_weight_page.dart
+│
+├── main.dart
+└── injection.dart
