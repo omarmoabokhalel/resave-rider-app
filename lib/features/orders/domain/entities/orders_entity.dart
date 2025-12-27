@@ -1,0 +1,11 @@
+import 'package:equatable/equatable.dart';
+
+class OrdersEntity extends Equatable {
+  final String id;
+  final String name;
+
+  const OrdersEntity({required this.id, required this.name});
+
+  @override
+  List<Object?> get props => [id, name];
+}
