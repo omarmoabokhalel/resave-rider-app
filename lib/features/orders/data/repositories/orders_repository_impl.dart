@@ -17,4 +17,5 @@ class OrdersRepositoryImpl implements OrdersRepository {
       int orderId, List<Map<String, dynamic>> items) {
     return remote.updateWeight(orderId, items);
   }
+  
 }

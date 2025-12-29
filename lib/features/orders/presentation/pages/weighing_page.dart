@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:resave_rider/features/orders/presentation/bloc/order_bloc.dart';
 import 'package:resave_rider/features/orders/presentation/bloc/order_event.dart';
+import 'package:resave_rider/features/orders/presentation/bloc/order_state.dart';
+import 'package:resave_rider/features/orders/presentation/pages/orders_page.dart';
 
 import '../../data/models/orders_model.dart';
 
@@ -35,34 +37,54 @@ class _WeighingPageState extends State<WeighingPage> {
   }
 
   void submitWeights() {
-    final items = <Map<String, dynamic>>[];
+  final items = <Map<String, dynamic>>[];
 
-    controllers.forEach((orderItemId, controller) {
-      if (controller.text.isNotEmpty) {
-        items.add({
-          'order_item_id': orderItemId,
-          'actual_quantity': double.parse(controller.text),
-        });
-      }
-    });
-
-    if (items.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('من فضلك أدخل وزن عنصر واحد على الأقل')),
-      );
-      return;
+  controllers.forEach((orderItemId, controller) {
+    if (controller.text.isNotEmpty) {
+      items.add({
+        'order_item_id': orderItemId,
+        'actual_quantity': double.parse(controller.text),
+      });
     }
+  });
 
-    context.read<OrdersBloc>().add(
-          UpdateWeightEvent(widget.order.id, items),
-        );
-
-    Navigator.pop(context); // رجوع لصفحة الطلبات
+  if (items.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('من فضلك أدخل وزن عنصر واحد على الأقل')),
+    );
+    return;
   }
+
+  context.read<OrdersBloc>().add(
+        UpdateWeightEvent(widget.order.id, items),
+      );
+}
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocListener<OrdersBloc, OrdersState>(
+  listener: (context, state) {
+    if (state is OrdersLoading) {
+      // ممكن تحط loading لو حابب
+    }
+
+    if (state is OrdersLoaded) {
+      // بعد ما الوزن يتحدث + الأوردرات تتحمل
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => OrdersPage()),
+        (route) => false,
+      );
+    }
+
+    if (state is OrdersError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.message)),
+      );
+    }
+  },
+  child: Scaffold(
       appBar: AppBar(
         title: Text('تأكيد الاستلام'),
       ),
@@ -152,6 +174,6 @@ class _WeighingPageState extends State<WeighingPage> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

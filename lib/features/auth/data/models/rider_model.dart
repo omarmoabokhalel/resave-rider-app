@@ -13,10 +13,10 @@ class RiderModel {
 
   factory RiderModel.fromJson(Map<String, dynamic> json) {
     return RiderModel(
-      id: json['rider']['id'],
-      name: json['rider']['name'],
-      email: json['rider']['email'],
-      token: json['token'],
+      id: json['rider']['id'] as int,
+      name: json['rider']['name'] as String,
+      email: json['rider']['email'] as String,
+      token: json['token'] as String,
     );
   }
 }

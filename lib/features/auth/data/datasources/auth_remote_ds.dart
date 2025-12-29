@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:resave_rider/core/api/api_service.dart';
 import '../models/rider_model.dart';
 
@@ -11,19 +10,15 @@ class AuthRemoteDataSource {
     try {
       final response = await api.dio.post(
         '/login/rider',
-        data: {
-          'email': email,
-          'password': password,
-        },
+        data: {'email': email, 'password': password},
       );
 
-      if (response.statusCode == 200) {
-        return RiderModel.fromJson(response.data);
-      } else {
-        throw Exception('Login failed: ${response.statusCode}');
-      }
+      print('LOGIN RESPONSE => ${response.data}');
+
+      return RiderModel.fromJson(response.data);
     } catch (e) {
-      throw Exception('Login failed: $e');
+      print('LOGIN ERROR => $e');
+      rethrow;
     }
   }
 }

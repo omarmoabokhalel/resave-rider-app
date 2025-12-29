@@ -11,12 +11,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginRiderEvent>((event, emit) async {
       emit(AuthLoading());
       try {
-        final rider =
-            await loginRider(event.email, event.password);
-            await TokenStorage.saveToken(rider.token);
+        final rider = await loginRider(event.email, event.password);
+        await TokenStorage.saveToken(rider.token);
         emit(AuthSuccess(rider.token));
       } catch (e) {
-        emit(AuthError('بيانات الدخول غير صحيحة'));
+        print('AUTH BLOC ERROR => $e');
+        emit(AuthError(e.toString()));
       }
     });
   }

@@ -12,7 +12,7 @@ class OrderDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LatLng location = LatLng(order.lat, order.lng);
+    final LatLng location = LatLng(order.latitude ?? 0, order.longitude ?? 0);
 
     return Scaffold(
       appBar: AppBar(
@@ -34,32 +34,32 @@ class OrderDetailsPage extends StatelessWidget {
 
             ListTile(
               leading: Icon(Icons.location_on),
-              title: Text(order.address),
+              title: Text(order.address ?? 'لا يوجد عنوان'),
               subtitle: Text('العنوان'),
             ),
 
             /// 🗺️ الخريطة
-            Container(
-              height: 200,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: location,
-                    zoom: 15,
-                  ),
-                  markers: {
-                    Marker(
-                      markerId: MarkerId('order_location'),
-                      position: location,
-                    ),
-                  },
-                  zoomControlsEnabled: false,
-                  myLocationButtonEnabled: false,
-                ),
-              ),
-            ),
+            // Container(
+            //   height: 200,
+            //   margin: const EdgeInsets.symmetric(horizontal: 16),
+            //   child: ClipRRect(
+            //     borderRadius: BorderRadius.circular(12),
+            //     child: GoogleMap(
+            //       initialCameraPosition: CameraPosition(
+            //         target: location,
+            //         zoom: 15,
+            //       ),
+            //       markers: {
+            //         Marker(
+            //           markerId: MarkerId('order_location'),
+            //           position: location,
+            //         ),
+            //       },
+            //       zoomControlsEnabled: false,
+            //       myLocationButtonEnabled: false,
+            //     ),
+            //   ),
+            // ),
 
             /// 🔗 فتح الموقع على Google Maps
             Padding(
@@ -69,7 +69,7 @@ class OrderDetailsPage extends StatelessWidget {
                 label: Text('فتح الموقع على الخريطة'),
                 onPressed: () {
                   final url =
-                      'https://www.google.com/maps/search/?api=1&query=${order.lat},${order.lng}';
+                      'https://www.google.com/maps/search/?api=1&query=${order.latitude},${order.longitude}';
                   launchUrl(Uri.parse(url));
                 },
               ),

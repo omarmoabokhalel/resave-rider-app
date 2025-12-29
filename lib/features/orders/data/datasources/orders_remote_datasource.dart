@@ -35,4 +35,10 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
       },
     );
   }
+
+  Future<void> acceptOrder(int orderId) async {
+  await api.dio.post('/rider/order/$orderId/accept');
 }
+
+}
+
