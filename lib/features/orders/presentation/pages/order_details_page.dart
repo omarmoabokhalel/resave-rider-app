@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:resave_rider/features/orders/presentation/bloc/order_bloc.dart';
+import 'package:resave_rider/features/orders/presentation/bloc/order_event.dart';
 import 'package:resave_rider/features/orders/presentation/pages/weighing_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -15,14 +18,11 @@ class OrderDetailsPage extends StatelessWidget {
     final LatLng location = LatLng(order.latitude ?? 0, order.longitude ?? 0);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('تفاصيل الطلب #${order.id}'),
-      ),
+      appBar: AppBar(title: Text('تفاصيل الطلب #${order.id}')),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             /// 🧍 بيانات العميل
             Padding(
               padding: const EdgeInsets.all(16),
@@ -95,9 +95,7 @@ class OrderDetailsPage extends StatelessWidget {
                 return ListTile(
                   leading: Icon(Icons.recycling),
                   title: Text(item.itemName),
-                  subtitle: Text(
-                    'الكمية المتوقعة: ${item.estimatedQuantity}',
-                  ),
+                  subtitle: Text('الكمية المتوقعة: ${item.estimatedQuantity}'),
                 );
               },
             ),
@@ -110,14 +108,9 @@ class OrderDetailsPage extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(16),
-                  ),
-                  child: Text(
-                    'بدء الاستلام',
-                    style: TextStyle(fontSize: 18),
-                  ),
                   onPressed: () {
+                    context.read<OrdersBloc>().add(AcceptOrderEvent(order.id));
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -125,6 +118,7 @@ class OrderDetailsPage extends StatelessWidget {
                       ),
                     );
                   },
+                  child: Text('بدء الاستلام'),
                 ),
               ),
             ),

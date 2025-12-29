@@ -8,3 +8,7 @@ class UpdateWeightEvent extends OrdersEvent {
 
   UpdateWeightEvent(this.orderId, this.items);
 }
+class AcceptOrderEvent extends OrdersEvent {
+  final int orderId;
+  AcceptOrderEvent(this.orderId);
+}

@@ -79,7 +79,6 @@ class _UpdateWeightPageState extends State<UpdateWeightPage> {
                     );
 
                 Navigator.pop(context);
-                Navigator.pop(context);
               },
             ),
           )

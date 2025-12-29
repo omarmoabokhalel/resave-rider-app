@@ -3,6 +3,7 @@ import 'package:resave_rider/features/orders/data/models/orders_model.dart';
 
 abstract class OrdersRemoteDataSource {
   Future<List<OrderModel>> getOrders();
+  Future<void> acceptOrder(int orderId);
   Future<void> updateWeight(
     int orderId,
     List<Map<String, dynamic>> items,
@@ -17,28 +18,26 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
   @override
   Future<List<OrderModel>> getOrders() async {
     final response = await api.dio.get('/rider/orders');
-
-    final List data = response.data as List;
-
-    return data
+    return (response.data as List)
         .map((e) => OrderModel.fromJson(e))
         .toList();
   }
 
   @override
-  Future<void> updateWeight(
-      int orderId, List<Map<String, dynamic>> items) async {
-    await api.dio.post(
-      '/rider/order/$orderId/update-weight',
-      data: {
-        'items': items,
-      },
-    );
+  Future<void> acceptOrder(int orderId) async {
+    await api.dio.post('/rider/order/$orderId/accept');
   }
 
-  Future<void> acceptOrder(int orderId) async {
-  await api.dio.post('/rider/order/$orderId/accept');
+  @override
+  Future<void> updateWeight(
+    int orderId,
+    List<Map<String, dynamic>> items,
+  ) async {
+    await api.dio.post(
+      '/rider/order/$orderId/update-weight',
+      data: {'items': items},
+    );
+  }
 }
 
-}
 

@@ -8,14 +8,16 @@ class OrdersRepositoryImpl implements OrdersRepository {
   OrdersRepositoryImpl(this.remote);
 
   @override
-  Future<List<OrderModel>> getOrders() {
-    return remote.getOrders();
-  }
+  Future<List<OrderModel>> getOrders() => remote.getOrders();
+
+  @override
+  Future<void> acceptOrder(int orderId) =>
+      remote.acceptOrder(orderId);
 
   @override
   Future<void> updateWeight(
-      int orderId, List<Map<String, dynamic>> items) {
-    return remote.updateWeight(orderId, items);
-  }
-  
+    int orderId,
+    List<Map<String, dynamic>> items,
+  ) =>
+      remote.updateWeight(orderId, items);
 }

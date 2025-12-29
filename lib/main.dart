@@ -5,8 +5,8 @@ import 'package:resave_rider/features/auth/data/repositories/auth_repo_impl.dart
 import 'package:resave_rider/features/auth/domain/usecases/login_rider.dart';
 import 'package:resave_rider/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:resave_rider/features/auth/presentation/pages/login_page.dart';
+import 'package:resave_rider/features/orders/domain/usecases/accepted_order.dart';
 import 'package:resave_rider/features/orders/presentation/bloc/order_bloc.dart';
-
 import 'core/api/api_service.dart';
 import 'core/storage/token_storage.dart';
 import 'features/orders/domain/usecases/get_orders.dart';
@@ -26,7 +26,7 @@ void main() async {
   final ordersRepository = OrdersRepositoryImpl(ordersRemote);
   final getOrdersUseCase = GetOrders(ordersRepository);
   final updateWeightUseCase = UpdateWeight(ordersRepository);
-
+  final acceptedOrderUseCase = AcceptOrder(ordersRepository);
   final authRemote = AuthRemoteDataSource(apiService);
   final authRepository = AuthRepositoryImpl(authRemote);
   final loginRiderUseCase = LoginRider(authRepository);
@@ -36,7 +36,7 @@ void main() async {
       providers: [
         BlocProvider(create: (_) => AuthBloc(loginRiderUseCase)),
         BlocProvider(
-          create: (_) => OrdersBloc(getOrdersUseCase, updateWeightUseCase),
+          create: (_) => OrdersBloc(getOrdersUseCase, updateWeightUseCase, acceptedOrderUseCase),
         ),
       ],
       child: MyApp(initialToken: token),
