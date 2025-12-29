@@ -12,3 +12,8 @@ class AcceptOrderEvent extends OrdersEvent {
   final int orderId;
   AcceptOrderEvent(this.orderId);
 }
+
+class CompleteOrderEvent extends OrdersEvent {
+  final int orderId;
+  CompleteOrderEvent(this.orderId);
+}
