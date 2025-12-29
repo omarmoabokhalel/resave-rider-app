@@ -7,5 +7,6 @@ abstract class OrdersRepository {
     int orderId,
     List<Map<String, dynamic>> items,
   );
+  Future<void> completeOrder(int orderId);
 }
 
