@@ -1,8 +1,6 @@
-import 'package:resave_rider/features/orders/data/datasources/orders_remote_datasource.dart';
-import 'package:resave_rider/features/orders/data/models/orders_model.dart';
-
 import '../../domain/repositories/orders_repository.dart';
-
+import '../datasources/orders_remote_datasource.dart';
+import '../models/orders_model.dart';
 
 class OrdersRepositoryImpl implements OrdersRepository {
   final OrdersRemoteDataSource remote;
@@ -15,7 +13,8 @@ class OrdersRepositoryImpl implements OrdersRepository {
   }
 
   @override
-  Future<void> updateWeight(int orderId, List<Map<String, dynamic>> items) {
+  Future<void> updateWeight(
+      int orderId, List<Map<String, dynamic>> items) {
     return remote.updateWeight(orderId, items);
   }
 }

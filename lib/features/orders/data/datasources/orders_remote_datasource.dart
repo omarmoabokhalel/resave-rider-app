@@ -1,14 +1,15 @@
+import 'package:resave_rider/core/api/api_service.dart';
 import 'package:resave_rider/features/orders/data/models/orders_model.dart';
-
-import '../../../../core/api/api_service.dart';
 
 abstract class OrdersRemoteDataSource {
   Future<List<OrderModel>> getOrders();
-  Future<void> updateWeight(int orderId, List<Map<String, dynamic>> items);
+  Future<void> updateWeight(
+    int orderId,
+    List<Map<String, dynamic>> items,
+  );
 }
 
-class OrdersRemoteDataSourceImpl
-    implements OrdersRemoteDataSource {
+class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
   final ApiService api;
 
   OrdersRemoteDataSourceImpl(this.api);
@@ -16,7 +17,10 @@ class OrdersRemoteDataSourceImpl
   @override
   Future<List<OrderModel>> getOrders() async {
     final response = await api.dio.get('/rider/orders');
-    return (response.data as List)
+
+    final List data = response.data as List;
+
+    return data
         .map((e) => OrderModel.fromJson(e))
         .toList();
   }
@@ -26,7 +30,9 @@ class OrdersRemoteDataSourceImpl
       int orderId, List<Map<String, dynamic>> items) async {
     await api.dio.post(
       '/rider/order/$orderId/update-weight',
-      data: {'items': items},
+      data: {
+        'items': items,
+      },
     );
   }
 }

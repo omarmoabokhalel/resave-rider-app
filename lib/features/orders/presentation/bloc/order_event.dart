@@ -1,10 +1,10 @@
 abstract class OrdersEvent {}
 
-class LoadOrders extends OrdersEvent {}
+class LoadOrdersEvent extends OrdersEvent {}
 
-class SubmitWeight extends OrdersEvent {
+class UpdateWeightEvent extends OrdersEvent {
   final int orderId;
   final List<Map<String, dynamic>> items;
 
-  SubmitWeight(this.orderId, this.items);
+  UpdateWeightEvent(this.orderId, this.items);
 }
