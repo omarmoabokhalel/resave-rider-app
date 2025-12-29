@@ -1,19 +1,24 @@
 import 'package:resave_rider/core/api/api_service.dart';
-import 'package:resave_rider/features/auth/data/models/rider_model.dart';
+import '../models/rider_model.dart';
 
 class AuthRemoteDataSource {
   final ApiService api;
 
   AuthRemoteDataSource(this.api);
 
-  Future<RiderModel> login(String phone, String password) async {
-    final response = await api.dio.post(
-      "/rider/login",
-      data: {
-        "phone": phone,
-        "password": password,
-      },
-    );
-    return RiderModel.fromJson(response.data);
+  Future<RiderModel> loginRider(String email, String password) async {
+    try {
+      final response = await api.dio.post(
+        '/login/rider',
+        data: {'email': email, 'password': password},
+      );
+
+      print('LOGIN RESPONSE => ${response.data}');
+
+      return RiderModel.fromJson(response.data);
+    } catch (e) {
+      print('LOGIN ERROR => $e');
+      rethrow;
+    }
   }
 }

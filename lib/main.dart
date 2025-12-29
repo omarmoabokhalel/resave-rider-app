@@ -1,65 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'core/routes/routes.dart';
-import 'core/theme/app_theme.dart';
-import 'core/di/injection_container.dart' as di;
-import 'core/localization/localization_manager.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:resave_rider/features/auth/data/datasources/auth_remote_ds.dart';
+import 'package:resave_rider/features/auth/data/repositories/auth_repo_impl.dart';
+import 'package:resave_rider/features/auth/domain/usecases/login_rider.dart';
+import 'package:resave_rider/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:resave_rider/features/auth/presentation/pages/login_page.dart';
+import 'package:resave_rider/features/orders/domain/usecases/accepted_order.dart';
+import 'package:resave_rider/features/orders/presentation/bloc/order_bloc.dart';
+import 'core/api/api_service.dart';
+import 'core/storage/token_storage.dart';
+import 'features/orders/domain/usecases/get_orders.dart';
+import 'features/orders/domain/usecases/update_weight.dart';
+import 'features/orders/data/repositories/orders_repository_impl.dart';
+import 'features/orders/data/datasources/orders_remote_datasource.dart';
+import 'features/orders/presentation/pages/orders_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await EasyLocalization.ensureInitialized();
 
-  // Set preferred orientations
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  final token = await TokenStorage.getToken();
 
-  // Set system UI overlay style
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ),
-  );
+  final apiService = ApiService();
 
-  // Initialize dependency injection
-  await di.init();
+  final ordersRemote = OrdersRemoteDataSourceImpl(apiService);
+  final ordersRepository = OrdersRepositoryImpl(ordersRemote);
+  final getOrdersUseCase = GetOrders(ordersRepository);
+  final updateWeightUseCase = UpdateWeight(ordersRepository);
+  final acceptedOrderUseCase = AcceptOrder(ordersRepository);
+  final authRemote = AuthRemoteDataSource(apiService);
+  final authRepository = AuthRepositoryImpl(authRemote);
+  final loginRiderUseCase = LoginRider(authRepository);
 
   runApp(
-    EasyLocalization(
-      supportedLocales: LocalizationManager.supportedLocales,
-      path: LocalizationManager.translationsPath,
-      fallbackLocale: LocalizationManager.fallbackLocale,
-      startLocale: LocalizationManager.fallbackLocale,
-      child: const MyApp(),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => AuthBloc(loginRiderUseCase)),
+        BlocProvider(
+          create: (_) => OrdersBloc(getOrdersUseCase, updateWeightUseCase, acceptedOrderUseCase),
+        ),
+      ],
+      child: MyApp(initialToken: token),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String? initialToken;
+
+  const MyApp({super.key, this.initialToken});
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return MaterialApp(
-          title: 'Flutter Forge App',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.darkTheme,
-          initialRoute: Routes.login,
-          // onGenerateRoute: AppRouter.generateRoute,
-          localizationsDelegates: context.localizationDelegates,
-          locale: const Locale('ar'),
-          supportedLocales: const [Locale('ar')],
-        );
-      },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'ReSave Rider App',
+      theme: ThemeData(primarySwatch: Colors.green),
+      home: initialToken != null ? OrdersPage() : LoginPage(),
     );
   }
 }
