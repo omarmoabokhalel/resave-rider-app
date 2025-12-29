@@ -6,6 +6,7 @@ import 'package:resave_rider/features/auth/domain/usecases/login_rider.dart';
 import 'package:resave_rider/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:resave_rider/features/auth/presentation/pages/login_page.dart';
 import 'package:resave_rider/features/orders/domain/usecases/accepted_order.dart';
+import 'package:resave_rider/features/orders/domain/usecases/complete_order.dart';
 import 'package:resave_rider/features/orders/presentation/bloc/order_bloc.dart';
 import 'core/api/api_service.dart';
 import 'core/storage/token_storage.dart';
@@ -27,6 +28,7 @@ void main() async {
   final getOrdersUseCase = GetOrders(ordersRepository);
   final updateWeightUseCase = UpdateWeight(ordersRepository);
   final acceptedOrderUseCase = AcceptOrder(ordersRepository);
+  final completeOrderUseCase = CompleteOrder(ordersRepository);
   final authRemote = AuthRemoteDataSource(apiService);
   final authRepository = AuthRepositoryImpl(authRemote);
   final loginRiderUseCase = LoginRider(authRepository);
@@ -36,7 +38,7 @@ void main() async {
       providers: [
         BlocProvider(create: (_) => AuthBloc(loginRiderUseCase)),
         BlocProvider(
-          create: (_) => OrdersBloc(getOrdersUseCase, updateWeightUseCase, acceptedOrderUseCase),
+          create: (_) => OrdersBloc(getOrdersUseCase, updateWeightUseCase, acceptedOrderUseCase, completeOrderUseCase),
         ),
       ],
       child: MyApp(initialToken: token),
@@ -51,11 +53,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ReSave Rider App',
-      theme: ThemeData(primarySwatch: Colors.green),
-      home: initialToken != null ? OrdersPage() : LoginPage(),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'ReSave Rider App',
+        theme: ThemeData(primarySwatch: Colors.green),
+        home: initialToken != null ? OrdersPage() : LoginPage(),
+      ),
     );
   }
 }

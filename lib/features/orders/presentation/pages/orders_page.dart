@@ -5,8 +5,6 @@ import 'package:resave_rider/features/orders/presentation/bloc/order_event.dart'
 import 'package:resave_rider/features/orders/presentation/bloc/order_state.dart';
 import 'package:resave_rider/features/orders/presentation/widgets/orders_list.dart';
 
-import 'order_details_page.dart';
-
 class OrdersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -16,7 +14,8 @@ class OrdersPage extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('الطلبات'),
+          centerTitle: true,
+          title: Text('الطلبات', style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
           bottom: const TabBar(
             tabs: [
               Tab(text: 'طلبات متاحة'),

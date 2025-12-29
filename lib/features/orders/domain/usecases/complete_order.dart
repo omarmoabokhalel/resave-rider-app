@@ -1,5 +1,10 @@
-import 'package:resave_rider/features/orders/domain/usecases/complete_order.dart' as repository;
+import 'package:resave_rider/features/orders/domain/repositories/orders_repository.dart';
+class CompleteOrder {
+  final OrdersRepository repository;
 
-Future<void> completeOrder(int orderId) {
-  return repository.completeOrder(orderId);
+  CompleteOrder(this.repository);
+
+  Future<void> call(int orderId) {
+    return repository.completeOrder(orderId);
+  }
 }

@@ -84,96 +84,100 @@ class _WeighingPageState extends State<WeighingPage> {
       );
     }
   },
-  child: Scaffold(
-      appBar: AppBar(
-        title: Text('تأكيد الاستلام'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-
-            /// ⚠️ تنبيه
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.warning, color: Colors.orange),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'يرجى إدخال الوزن بدقة، سيتم حساب النقاط بناءً عليه',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 16),
-
-            /// 📦 العناصر
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.order.items.length,
-                itemBuilder: (context, index) {
-                  final item = widget.order.items[index];
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.itemName,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'الكمية المتوقعة: ${item.estimatedQuantity}',
-                          ),
-                          SizedBox(height: 8),
-                          TextField(
-                            controller: controllers[item.id],
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                            decoration: InputDecoration(
-                              labelText: 'الوزن الفعلي',
-                              suffixText: 'كجم',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                        ],
+  child: Directionality(
+    textDirection: TextDirection.rtl,
+    child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text('تأكيد الاستلام', style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+    
+              /// ⚠️ تنبيه
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning, color: Colors.orange),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'يرجى إدخال الوزن بدقة، سيتم حساب النقاط بناءً عليه',
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
-
-            /// ✅ تأكيد
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.all(16),
+                  ],
                 ),
-                child: Text(
-                  'تأكيد الاستلام',
-                  style: TextStyle(fontSize: 18),
-                ),
-                onPressed: submitWeights,
               ),
-            ),
-          ],
+    
+              SizedBox(height: 16),
+    
+              /// 📦 العناصر
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.order.items.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.order.items[index];
+                    return Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.itemName,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'الكمية المتوقعة: ${item.estimatedQuantity}',
+                            ),
+                            SizedBox(height: 8),
+                            TextField(
+                              controller: controllers[item.id],
+                              keyboardType:
+                                  TextInputType.numberWithOptions(decimal: true),
+                              decoration: InputDecoration(
+                                labelText: 'الوزن الفعلي',
+                                suffixText: 'كجم',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+    
+              /// ✅ تأكيد
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.all(16),
+                  ),
+                  child: Text(
+                    'تأكيد الاستلام',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  onPressed: submitWeights,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+  ));
   }
 }

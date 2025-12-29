@@ -8,6 +8,7 @@ abstract class OrdersRemoteDataSource {
     int orderId,
     List<Map<String, dynamic>> items,
   );
+  Future<void> completeOrder(int orderId);
 }
 
 class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
@@ -38,6 +39,11 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
       data: {'items': items},
     );
   }
+  @override
+  Future<void> completeOrder(int orderId) async {
+  await api.dio.post('/rider/order/$orderId/complete');
+}
+
 }
 
 
