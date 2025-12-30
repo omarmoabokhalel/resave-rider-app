@@ -1,291 +1,177 @@
-import 'package:resave_rider/core/api/api_service.dart';
-import 'package:resave_rider/features/orders/data/models/orders_model.dart';
+# ♻️ ReSave Rider App
 
-abstract class OrdersRemoteDataSource {
-  Future<List<OrderModel>> getOrders();
-  Future<void> updateWeight(
-    int orderId,
-    List<Map<String, dynamic>> items,
-  );
-}
+A mobile application built with **Flutter** for riders who collect recyclable items from users as part of the **ReSave** recycling system.
 
-class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
-  final ApiService api;
+The app allows riders to:
 
-  OrdersRemoteDataSourceImpl(this.api);
+* View available orders
+* Accept and manage their assigned orders
+* Confirm collection by entering actual weights
+* Complete orders after delivery to the warehouse
 
-  @override
-  Future<List<OrderModel>> getOrders() async {
-    final response = await api.dio.get('/rider/orders');
+---
 
-    final List data = response.data as List;
+## 📱 App Overview
 
-    return data
-        .map((e) => OrderModel.fromJson(e))
-        .toList();
-  }
+**ReSave Rider** is a dedicated app for riders responsible for collecting recyclable materials from users and delivering them to the storage facility.
 
-  @override
-  Future<void> updateWeight(
-      int orderId, List<Map<String, dynamic>> items) async {
-    await api.dio.post(
-      '/rider/order/$orderId/update-weight',
-      data: {
-        'items': items,
-      },
-    );
-  }
-}
+The application communicates with a **Laravel REST API** and follows a **Clean Architecture + BLoC** pattern for scalability and maintainability.
 
-class OrderItemModel {
-  final int id;
-  final String itemName;
-  final double estimatedQuantity;
+---
 
-  OrderItemModel({
-    required this.id,
-    required this.itemName,
-    required this.estimatedQuantity,
-  });
+## 🚀 Main Features
 
-  factory OrderItemModel.fromJson(Map<String, dynamic> json) {
-    return OrderItemModel(
-      id: json['id'],
-      itemName: json['item']['name'],
-      estimatedQuantity:
-          double.parse(json['estimated_quantity'].toString()),
-    );
-  }
-}
+### 🔐 Authentication
 
-import 'package:resave_rider/features/orders/data/models/order_item_model.dart';
+* Rider login using email & password
+* Secure token-based authentication (Sanctum)
 
-class OrderModel {
-  final int id;
-  final String status;
-  final String address;
-  final double lat;
-  final double lng;
-  final List<OrderItemModel> items;
+### 📦 Orders Management
 
-  OrderModel({
-    required this.id,
-    required this.status,
-    required this.address,
-    required this.lat,
-    required this.lng,
-    required this.items,
-  });
+Orders are divided into two main sections:
 
-  factory OrderModel.fromJson(Map<String, dynamic> json) {
-    return OrderModel(
-      id: json['id'],
-      status: json['status'],
-      address: json['address'],
-      lat: double.parse(json['lat'].toString()),
-      lng: double.parse(json['lng'].toString()),
-      items: (json['items'] as List)
-          .map((e) => OrderItemModel.fromJson(e))
-          .toList(),
-    );
-  }
-}
+#### 1️⃣ Available Orders
+
+* Orders with status `pending`
+* No rider assigned yet
+* Rider can accept the order
+
+#### 2️⃣ My Orders
+
+* Orders assigned to the logged-in rider
+* Includes:
+
+  * `assigned` → accepted but not collected
+  * `collected` → items collected and weighed
+  * `delivered` → order completed
+
+---
+
+### 🛠 Order Flow
+
+pending → assigned → collected → delivered
 
 
-import '../../domain/repositories/orders_repository.dart';
-import '../datasources/orders_remote_datasource.dart';
-import '../models/orders_model.dart';
+| Status    | Description                              |
+| --------- | ---------------------------------------- |
+| pending   | Order created by user, waiting for rider |
+| assigned  | Rider accepted the order                 |
+| collected | Rider entered actual weights             |
+| delivered | Order delivered to warehouse             |
 
-class OrdersRepositoryImpl implements OrdersRepository {
-  final OrdersRemoteDataSource remote;
+---
 
-  OrdersRepositoryImpl(this.remote);
+### ⚖️ Weighing & Confirmation
 
-  @override
-  Future<List<OrderModel>> getOrders() {
-    return remote.getOrders();
-  }
+* Rider enters the **actual weight** for each item
+* System calculates:
 
-  @override
-  Future<void> updateWeight(
-      int orderId, List<Map<String, dynamic>> items) {
-    return remote.updateWeight(orderId, items);
-  }
-}
+  * Total quantity
+  * Earned points
+* Order status automatically changes to `collected`
+
+---
+
+### 📸 Item Images
+
+* Each order item includes an image uploaded by the user
+* Images are displayed in the order details screen
+* Used for verification before collection
+
+---
+
+### ✅ Order Completion
+
+* After delivery to warehouse
+* Rider marks order as **completed**
+* Status changes to `delivered`
+
+---
+
+## 🧱 Architecture
+
+The app follows **Clean Architecture**:
+
+lib/
+│
+├── core/
+│   ├── api/
+│   └── error/
+│
+├── features/
+│   └── orders/
+│       ├── data/
+│       │   ├── models
+│       │   ├── datasources
+│       │   └── repositories
+│       ├── domain/
+│       │   ├── entities
+│       │   └── usecases
+│       └── presentation/
+│           ├── bloc
+│           └── pages
+```
+
+* **State Management:** BLoC
+* **Networking:** Dio
+* **Architecture:** Clean Architecture
+* **UI Direction:** RTL (Arabic support)
+
+---
+
+## 🔗 API Endpoints Used
+
+| Method | Endpoint                          | Description           |
+| ------ | --------------------------------- | --------------------- |
+| POST   | `/rider/login`                    | Rider login           |
+| GET    | `/rider/orders`                   | Get all orders        |
+| POST   | `/rider/order/{id}/accept`        | Accept order          |
+| POST   | `/rider/order/{id}/update-weight` | Submit actual weights |
+| POST   | `/rider/order/{id}/complete`      | Complete order        |
+
+---
+
+## 🛠 Technologies Used
+
+* **Flutter**
+* **Dart**
+* **BLoC (flutter_bloc)**
+* **Dio**
+* **Laravel REST API**
+* **MySQL**
+* **Cloudinary (for images)**
+
+---
+
+## 🌍 Localization
+
+* Arabic language support
+* Right-to-left (RTL) layout enabled
+
+---
+
+## 📸 Screens 
+
+> Login
+> Orders List
+> Order Details
+> Weighing Page
+> Order Completion
 
 
-import 'package:equatable/equatable.dart';
 
-class OrdersEntity extends Equatable {
-  final String id;
-  final String name;
+---
 
-  const OrdersEntity({required this.id, required this.name});
+## 👨‍💻 Author
 
-  @override
-  List<Object?> get props => [id, name];
-}
+**Omar Mohamed Abokhalel**
+Full Stack Developer | Flutter Developer | Mobile Applications
+LinkedIn: *(https://www.linkedin.com/in/omarmoabokhalel)*
 
+---
 
-import '../../data/models/orders_model.dart';
+## 📌 Notes
 
-abstract class OrdersRepository {
-  Future<List<OrderModel>> getOrders();
-  Future<void> updateWeight(
-    int orderId,
-    List<Map<String, dynamic>> items,
-  );
-}
-
-
-import '../repositories/orders_repository.dart';
-import '../../data/models/orders_model.dart';
-
-class GetOrders {
-  final OrdersRepository repository;
-
-  GetOrders(this.repository);
-
-  Future<List<OrderModel>> call() {
-    return repository.getOrders();
-  }
-}
-
-
-import '../repositories/orders_repository.dart';
-
-class UpdateWeight {
-  final OrdersRepository repository;
-
-  UpdateWeight(this.repository);
-
-  Future<void> call(
-    int orderId,
-    List<Map<String, dynamic>> items,
-  ) {
-    return repository.updateWeight(orderId, items);
-  }
-}
-
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:resave_rider/features/orders/presentation/bloc/order_event.dart';
-import 'package:resave_rider/features/orders/presentation/bloc/order_state.dart';
-import '../../domain/usecases/get_orders.dart';
-import '../../domain/usecases/update_weight.dart';
-
-
-class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
-  final GetOrders getOrders;
-  final UpdateWeight updateWeight;
-
-  OrdersBloc(this.getOrders, this.updateWeight)
-      : super(OrdersInitial()) {
-    on<LoadOrdersEvent>((event, emit) async {
-      emit(OrdersLoading());
-      try {
-        final orders = await getOrders();
-        emit(OrdersLoaded(orders));
-      } catch (e) {
-        emit(OrdersError('فشل تحميل الطلبات'));
-      }
-    });
-
-    on<UpdateWeightEvent>((event, emit) async {
-      try {
-        await updateWeight(event.orderId, event.items);
-        add(LoadOrdersEvent()); // reload
-      } catch (e) {
-        emit(OrdersError('فشل تحديث الوزن'));
-      }
-    });
-  }
-}
-
-abstract class OrdersEvent {}
-
-class LoadOrdersEvent extends OrdersEvent {}
-
-class UpdateWeightEvent extends OrdersEvent {
-  final int orderId;
-  final List<Map<String, dynamic>> items;
-
-  UpdateWeightEvent(this.orderId, this.items);
-}
-
-import '../../data/models/orders_model.dart';
-
-abstract class OrdersState {}
-
-class OrdersInitial extends OrdersState {}
-
-class OrdersLoading extends OrdersState {}
-
-class OrdersLoaded extends OrdersState {
-  final List<OrderModel> orders;
-
-  OrdersLoaded(this.orders);
-}
-
-class OrdersError extends OrdersState {
-  final String message;
-
-  OrdersError(this.message);
-}
-
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:resave_rider/features/orders/presentation/bloc/order_bloc.dart';
-import 'package:resave_rider/features/orders/presentation/bloc/order_event.dart';
-import 'package:resave_rider/features/orders/presentation/bloc/order_state.dart';
-
-import 'order_details_page.dart';
-
-class OrdersPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    context.read<OrdersBloc>().add(LoadOrdersEvent());
-
-    return Scaffold(
-      appBar: AppBar(title: Text('الطلبات')),
-      body: BlocBuilder<OrdersBloc, OrdersState>(
-        builder: (context, state) {
-          if (state is OrdersLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (state is OrdersLoaded) {
-            return ListView.builder(
-              itemCount: state.orders.length,
-              itemBuilder: (context, index) {
-                final order = state.orders[index];
-                return Card(
-                  child: ListTile(
-                    title: Text('طلب #${order.id}'),
-                    subtitle: Text(order.status),
-                    trailing: Icon(Icons.arrow_forward),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              OrderDetailsPage(order: order),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            );
-          }
-
-          if (state is OrdersError) {
-            return Center(child: Text(state.message));
-          }
-
-          return SizedBox();
-        },
-      ),
-    );
-  }
-}
+* This app is part of the **ReSave Project**
+* Designed for real-world recycling workflow
+* Scalable and production-ready structure
