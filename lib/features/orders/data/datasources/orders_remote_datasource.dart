@@ -1,5 +1,7 @@
 import 'package:resave_rider/core/api/api_service.dart';
 import 'package:resave_rider/features/orders/data/models/orders_model.dart';
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 
 abstract class OrdersRemoteDataSource {
   Future<List<OrderModel>> getOrders();
@@ -30,15 +32,45 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
   }
 
   @override
-  Future<void> updateWeight(
-    int orderId,
-    List<Map<String, dynamic>> items,
-  ) async {
-    await api.dio.post(
-      '/rider/order/$orderId/update-weight',
-      data: {'items': items},
-    );
+Future<void> updateWeight(
+  int orderId,
+  List<Map<String, dynamic>> items,
+) async {
+  final formData = FormData();
+
+  for (int i = 0; i < items.length; i++) {
+    formData.fields.addAll([
+      MapEntry(
+        'items[$i][order_item_id]',
+        items[i]['order_item_id'].toString(),
+      ),
+      MapEntry(
+        'items[$i][actual_quantity]',
+        items[i]['actual_quantity'].toString(),
+      ),
+    ]);
+
+    if (items[i]['confirm_image'] != null) {
+      final XFile image = items[i]['confirm_image'];
+
+      formData.files.add(
+        MapEntry(
+          'items[$i][confirm_image]',
+          await MultipartFile.fromFile(
+            image.path,
+            filename: image.name,
+          ),
+        ),
+      );
+    }
   }
+
+  await api.dio.post(
+    '/rider/order/$orderId/update-weight',
+    data: formData,
+  );
+}
+
   @override
   Future<void> completeOrder(int orderId) async {
   await api.dio.post('/rider/order/$orderId/complete');

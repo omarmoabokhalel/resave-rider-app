@@ -4,9 +4,8 @@ import 'package:resave_rider/features/orders/presentation/bloc/order_bloc.dart';
 import 'package:resave_rider/features/orders/presentation/bloc/order_event.dart';
 import 'package:resave_rider/features/orders/presentation/bloc/order_state.dart';
 import 'package:resave_rider/features/orders/presentation/pages/orders_page.dart';
-
+import 'package:image_picker/image_picker.dart';
 import '../../data/models/orders_model.dart';
-
 
 class WeighingPage extends StatefulWidget {
   final OrderModel order;
@@ -20,6 +19,8 @@ class WeighingPage extends StatefulWidget {
 class _WeighingPageState extends State<WeighingPage> {
   final Map<int, TextEditingController> controllers = {};
   final _formKey = GlobalKey<FormState>();
+  final Map<int, XFile?> images = {};
+  final ImagePicker picker = ImagePicker();
 
   @override
   void initState() {
@@ -38,9 +39,7 @@ class _WeighingPageState extends State<WeighingPage> {
   }
 
   void submitWeights() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     final items = <Map<String, dynamic>>[];
 
@@ -49,33 +48,19 @@ class _WeighingPageState extends State<WeighingPage> {
         items.add({
           'order_item_id': orderItemId,
           'actual_quantity': double.parse(controller.text),
+          'confirm_image': images[orderItemId], // 👈 الصورة
         });
       }
     });
 
     if (items.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.warning, color: Colors.white),
-              SizedBox(width: 12),
-              Expanded(child: Text('من فضلك أدخل وزن عنصر واحد على الأقل')),
-            ],
-          ),
-          backgroundColor: Colors.orange[700],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
+        SnackBar(content: Text('من فضلك أدخل وزن عنصر واحد على الأقل')),
       );
       return;
     }
 
-    context.read<OrdersBloc>().add(
-          UpdateWeightEvent(widget.order.id, items),
-        );
+    context.read<OrdersBloc>().add(UpdateWeightEvent(widget.order.id, items));
   }
 
   @override
@@ -147,7 +132,11 @@ class _WeighingPageState extends State<WeighingPage> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.orange[800], size: 28),
+                      Icon(
+                        Icons.info_outline,
+                        color: Colors.orange[800],
+                        size: 28,
+                      ),
                       SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -205,7 +194,8 @@ class _WeighingPageState extends State<WeighingPage> {
                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           item.itemName,
@@ -231,7 +221,9 @@ class _WeighingPageState extends State<WeighingPage> {
                               SizedBox(height: 16),
                               TextFormField(
                                 controller: controllers[item.id],
-                                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                keyboardType: TextInputType.numberWithOptions(
+                                  decimal: true,
+                                ),
                                 decoration: InputDecoration(
                                   labelText: 'الوزن الفعلي',
                                   hintText: '0.0',
@@ -246,11 +238,16 @@ class _WeighingPageState extends State<WeighingPage> {
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.grey[300]!),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[300]!,
+                                    ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.blue[700]!, width: 2),
+                                    borderSide: BorderSide(
+                                      color: Colors.blue[700]!,
+                                      width: 2,
+                                    ),
                                   ),
                                   filled: true,
                                   fillColor: Colors.grey[50],
@@ -264,6 +261,43 @@ class _WeighingPageState extends State<WeighingPage> {
                                   }
                                   return null;
                                 },
+                              ),
+                              SizedBox(height: 12),
+
+                              Row(
+                                children: [
+                                  ElevatedButton.icon(
+                                    icon: Icon(Icons.camera_alt),
+                                    label: Text('تصوير للتأكيد'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue[600],
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      final image = await picker.pickImage(
+                                        source: ImageSource.camera,
+                                        imageQuality: 70,
+                                      );
+
+                                      if (image != null) {
+                                        setState(() {
+                                          images[item.id] = image;
+                                        });
+                                      }
+                                    },
+                                  ),
+
+                                  SizedBox(width: 12),
+
+                                  if (images[item.id] != null)
+                                    Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green,
+                                    ),
+                                ],
                               ),
                             ],
                           ),
@@ -291,7 +325,7 @@ class _WeighingPageState extends State<WeighingPage> {
               child: BlocBuilder<OrdersBloc, OrdersState>(
                 builder: (context, state) {
                   final isLoading = state is OrdersLoading;
-                  
+
                   return SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -302,7 +336,9 @@ class _WeighingPageState extends State<WeighingPage> {
                               height: 24,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : Icon(Icons.check_circle, size: 24),
