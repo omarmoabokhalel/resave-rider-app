@@ -5,6 +5,7 @@ import 'package:resave_rider/features/orders/presentation/pages/order_details_pa
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:resave_rider/features/orders/presentation/bloc/order_bloc.dart';
 import 'package:resave_rider/features/orders/presentation/bloc/order_event.dart';
+import 'package:resave_rider/features/orders/presentation/pages/weighing_page.dart';
 
 class OrdersList extends StatelessWidget {
   final List<OrderModel> orders;
@@ -123,11 +124,18 @@ class OrdersList extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
                 onTap: () {
-                  if (order.status == 'pending' || order.status == 'assigned') {
+                  if (order.status == 'pending') {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => OrderDetailsPage(order: order),
+                      ),
+                    );
+                  } else if (order.status == 'assigned') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => WeighingPage(order: order),
                       ),
                     );
                   } else if (order.status == 'collected') {
